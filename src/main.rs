@@ -1,3 +1,6 @@
+use std::process;
+
+pub mod app;
 pub mod cli;
 
 fn main() {
@@ -12,6 +15,20 @@ fn main() {
     };
 
     for app in apps {
+        let app = match app.to_str() {
+            Some(app) => match app::App::from_str(app) {
+                Some(app) => app,
+                None => {
+                    eprintln!("error: unknown app {:?}", app);
+                    process::exit(1);
+                }
+            },
+            None => {
+                eprintln!("error: invalid UTF-8 string {:?}", app);
+                process::exit(1);
+            }
+        };
+
         // TODO: Actually set the font.
         println!("Setting font {:?} for {:?}...", font, app);
     }
