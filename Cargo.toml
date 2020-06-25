@@ -1,0 +1,9 @@
+[package]
+name = "setfont"
+version = "0.0.0"
+authors = ["SavoryInk"]
+edition = "2018"
+description = "Set the font of editors and terminals"
+repository = "https://github.com/savoryink/setfont"
+homepage = "https://github.com/savoryink/setfont"
+documentation = "https://github.com/savoryink/setfont"
