@@ -8,3 +8,6 @@ description = "Set the font of editors and terminals"
 repository = "https://github.com/savoryink/setfont"
 homepage = "https://github.com/savoryink/setfont"
 documentation = "https://github.com/savoryink/setfont"
+
+[dependencies]
+clap = "2.33.1"
