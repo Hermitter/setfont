@@ -26,7 +26,7 @@ fn main() {
         _ => {}
     };
 
-    let apps = matches.values_of_os("apps").expect("required");
+    let app_args = matches.values_of_os("apps").expect("required");
 
     let font = matches.value_of_os("font").map(|font| {
         match font::Font::from_os_str(font) {
@@ -47,21 +47,35 @@ fn main() {
         (None, None) => unreachable!("required"),
     };
 
-    for app in apps {
-        let app = match app.to_str() {
+    let mut did_error = false;
+    let mut apps = Vec::<App>::new();
+
+    for app_arg in app_args {
+        let app = match app_arg.to_str() {
             Some(app) => match App::from_str(app) {
                 Some(app) => app,
                 None => {
                     eprintln!("error: unknown app {:?}", app);
-                    process::exit(1);
+                    did_error = true;
+                    continue;
                 }
             },
             None => {
-                eprintln!("error: invalid UTF-8 string {:?}", app);
-                process::exit(1);
+                eprintln!("error: invalid UTF-8 string {:?}", app_arg);
+                did_error = true;
+                continue;
             }
         };
 
+        apps.push(app);
+    }
+
+    for app in apps {
         app.apply(&setting);
+    }
+
+    // TODO: Set `did_error` if `App::apply` fails.
+    if did_error {
+        process::exit(1);
     }
 }
