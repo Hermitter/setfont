@@ -12,7 +12,7 @@ pub mod cli;
 pub mod ext;
 pub mod font;
 
-use app::Setting;
+use app::{App, Setting};
 use ext::ArgMatchesExt;
 
 fn main() {
@@ -20,7 +20,7 @@ fn main() {
 
     match matches.subcommand() {
         ("list", _) => {
-            app::App::print_all_options();
+            App::print_all_options();
             return;
         }
         _ => {}
@@ -49,7 +49,7 @@ fn main() {
 
     for app in apps {
         let app = match app.to_str() {
-            Some(app) => match app::App::from_str(app) {
+            Some(app) => match App::from_str(app) {
                 Some(app) => app,
                 None => {
                     eprintln!("error: unknown app {:?}", app);
