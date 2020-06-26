@@ -1,3 +1,5 @@
+use crate::Shared;
+
 mod setting;
 pub use setting::Setting;
 
@@ -71,7 +73,7 @@ apps! {
 
 impl App {
     /// Applies a setting state to the app, based on input arguments.
-    pub fn apply(self, setting: &Setting) {
+    pub fn apply(self, setting: &Setting, _shared: &Shared) {
         unimplemented!("apply {:?} to {:?}", setting, self);
     }
 }

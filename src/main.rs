@@ -5,16 +5,18 @@
 )))]
 compile_error!("Only macOS, Linux, and Windows are supported");
 
-use std::process;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
+use std::process;
 
 pub mod app;
 pub mod cli;
 pub mod ext;
 pub mod font;
+pub mod shared;
 
 use app::{App, Setting};
 use ext::ArgMatchesExt;
+use shared::Shared;
 
 fn main() {
     let matches = cli::app().get_matches();
@@ -71,6 +73,8 @@ fn main() {
         apps.push(app);
     }
 
+    let shared = Shared::new(did_error);
+
     // Remove duplicates.
     apps.sort_unstable();
     apps.dedup();
@@ -80,20 +84,19 @@ fn main() {
         0 => {}
         1 => {
             let app = apps[0];
-            app.apply(&setting);
+            app.apply(&setting, &shared);
         }
         _ => {
             // Using slice to avoid extra overhead of draining the vector.
             let apps = apps.as_slice();
 
             apps.into_par_iter().for_each(|app| {
-                app.apply(&setting);
+                app.apply(&setting, &shared);
             });
         }
     }
 
-    // TODO: Set `did_error` if `App::apply` fails.
-    if did_error {
+    if shared.did_error.into_inner() {
         process::exit(1);
     }
 }
