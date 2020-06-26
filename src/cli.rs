@@ -36,8 +36,20 @@ pub fn app() -> App<'static, 'static> {
                 .value_name("FONT")
                 .short("f")
                 .long("font")
-                .required(true)
-                .takes_value(true),
+                .takes_value(true)
+                .required_unless_one(&["ligatures", "no-ligatures"]),
+        )
+        .arg(
+            Arg::with_name("ligatures")
+                .help("Enables orthographic ligatures")
+                .short("l")
+                .long("ligatures"),
+        )
+        .arg(
+            Arg::with_name("no-ligatures")
+                .long("no-ligatures")
+                .overrides_with("ligatures")
+                .hidden(true),
         )
         .subcommand(
             SubCommand::with_name("list")

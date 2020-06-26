@@ -41,3 +41,12 @@ impl<'a> Font<'a> {
         self.0
     }
 }
+
+/// How to set orthographic ligatures.
+#[derive(Clone, Copy, Debug)]
+pub enum LigaturesFlag {
+    /// Ligatures should be enabled where possible.
+    Enable,
+    /// Ligatures should be disabled where enabled.
+    Disable,
+}

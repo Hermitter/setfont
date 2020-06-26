@@ -2,7 +2,10 @@ use std::process;
 
 pub mod app;
 pub mod cli;
+pub mod ext;
 pub mod font;
+
+use ext::ArgMatchesExt;
 
 fn main() {
     let matches = cli::app().get_matches();
@@ -16,20 +19,17 @@ fn main() {
     };
 
     let font = matches.value_of_os("font");
-    let apps = matches.values_of_os("apps");
+    let ligatures = matches.ligatures_flag();
 
-    let (font, apps) = match (font, apps) {
-        (Some(font), Some(apps)) => (font, apps),
-        _ => unreachable!("required values not provided"),
-    };
+    let apps = matches.values_of_os("apps").expect("required");
 
-    let font = match font::Font::from_os_str(font) {
+    let font = font.map(|font| match font::Font::from_os_str(font) {
         Some(font) => font,
         None => {
             eprintln!("error: invalid font name {:?}", font);
             process::exit(1);
         }
-    };
+    });
 
     for app in apps {
         let app = match app.to_str() {
@@ -46,7 +46,12 @@ fn main() {
             }
         };
 
-        // TODO: Actually set the font.
-        println!("Setting font {:?} for {:?}...", font.as_str(), app);
+        // TODO: Actually set the font and ligatures state.
+        if let Some(font) = font {
+            println!("Setting font {:?} for {:?}...", font.as_str(), app);
+        }
+        if let Some(ligatures) = ligatures {
+            println!("Setting ligatures to {:?} for {:?}...", ligatures, app);
+        }
     }
 }
