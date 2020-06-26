@@ -40,12 +40,24 @@ macro_rules! apps {
 }
 
 apps! {
+    /// [Alacritty](https://github.com/alacritty/alacritty) terminal.
+    Alacritty = "alacritty",
+
+    /// [Atom](https://github.com/atom/atom) editor by GitHub.
+    Atom = "atom",
+
+    /// [Sublime Text](https://www.sublimetext.com) editor.
+    SublimeText = "sublimetext",
+
     /// The "native" terminal app:
     ///
     /// - [macOS Terminal](https://en.wikipedia.org/wiki/Terminal_(macOS))
     /// - [Windows terminal](https://github.com/microsoft/terminal)
     /// - [GNOME terminal](https://gitlab.gnome.org/GNOME/gnome-terminal)
     Terminal = "terminal",
+
+    /// [Visual Studio Code](https://code.visualstudio.com) editor by Microsoft.
+    VsCode = "vscode",
 
     /// macOS Xcode.app.
     #[cfg(target_os = "macos")]
