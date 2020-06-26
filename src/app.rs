@@ -40,10 +40,11 @@ macro_rules! apps {
 }
 
 apps! {
-    /// Either macOS Terminal.app or [Windows terminal].
+    /// The "native" terminal app:
     ///
-    /// [Windows terminal]: https://github.com/microsoft/terminal
-    #[cfg(any(target_os = "macos", target_os = "windows"))]
+    /// - [macOS Terminal](https://en.wikipedia.org/wiki/Terminal_(macOS))
+    /// - [Windows terminal](https://github.com/microsoft/terminal)
+    /// - [GNOME terminal](https://gitlab.gnome.org/GNOME/gnome-terminal)
     Terminal = "terminal",
 
     /// macOS Xcode.app.
