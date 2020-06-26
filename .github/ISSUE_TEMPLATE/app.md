@@ -51,5 +51,5 @@ Why should this app be supported?
 <!--
 How could we go about supporting this app?
 
-If you're unsure, just write "Needs investigation". 🙂
+If you're unsure, just write "Needs investigation." 🙂
 -->
