@@ -18,7 +18,10 @@ supporting your suggested app.
 Full name: YourApp
 
 <!--
-Be sure that `yourapp` does not conflict with an existing app!
+This value is read by `setfont` to determine what app to target.
+
+Be sure that `yourapp` does not conflict with an existing app! However some
+values like `terminal` are exempt because the name exists on multiple platforms.
 -->
 Argument value: `yourapp`
 
