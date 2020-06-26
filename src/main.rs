@@ -1,3 +1,10 @@
+#[cfg(not(any(
+    target_os = "macos",
+    target_os = "linux",
+    target_os = "windows",
+)))]
+compile_error!("Only macOS, Linux, and Windows are supported");
+
 use std::process;
 
 pub mod app;
