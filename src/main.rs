@@ -29,7 +29,9 @@ fn main() {
         _ => {}
     };
 
-    let app_args = matches.values_of_os("apps").expect("required");
+    let app_args = matches
+        .values_of_os("apps")
+        .unwrap_or_else(|| unreachable!("required"));
 
     let font = matches.value_of_os("font").map(|font| {
         match font::Font::from_os_str(font) {
@@ -43,10 +45,8 @@ fn main() {
 
     let ligatures = matches.ligatures_flag();
 
-    let setting = match Setting::new(font, ligatures) {
-        Some(setting) => setting,
-        None => unreachable!("required"),
-    };
+    let setting = Setting::new(font, ligatures)
+        .unwrap_or_else(|| unreachable!("required"));
 
     let mut did_error = false;
     let mut apps = Vec::<App>::new();
