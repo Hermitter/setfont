@@ -7,6 +7,14 @@ pub mod font;
 fn main() {
     let matches = cli::app().get_matches();
 
+    match matches.subcommand() {
+        ("list", _) => {
+            app::App::print_all_options();
+            return;
+        }
+        _ => {}
+    };
+
     let font = matches.value_of_os("font");
     let apps = matches.values_of_os("apps");
 

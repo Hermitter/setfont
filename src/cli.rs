@@ -1,4 +1,4 @@
-use clap::{App, AppSettings, Arg};
+use clap::{App, AppSettings, Arg, SubCommand};
 
 const NAME: &str = env!("CARGO_PKG_NAME");
 
@@ -15,7 +15,10 @@ pub fn app() -> App<'static, 'static> {
         .author(AUTHOR)
         .version(VERSION)
         .about(ABOUT)
-        .settings(&[AppSettings::ArgRequiredElseHelp])
+        .settings(&[
+            AppSettings::ArgRequiredElseHelp,
+            AppSettings::SubcommandsNegateReqs,
+        ])
         .arg(
             Arg::with_name("font")
                 .help("The primary font to set")
@@ -34,5 +37,10 @@ pub fn app() -> App<'static, 'static> {
                 .takes_value(true)
                 .multiple(true)
                 .required(true),
+        )
+        .subcommand(
+            SubCommand::with_name("list")
+                .alias("ls")
+                .about("List all supported apps"),
         )
 }

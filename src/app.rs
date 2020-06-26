@@ -27,6 +27,14 @@ macro_rules! apps {
                     _ => None,
                 }
             }
+
+            /// Prints all app options.
+            pub fn print_all_options() {
+                $(
+                    #[cfg($cfg)]
+                    println!($option);
+                )+
+            }
         }
     };
 }
