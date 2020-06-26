@@ -70,6 +70,10 @@ fn main() {
         apps.push(app);
     }
 
+    // Remove duplicates.
+    apps.sort_unstable();
+    apps.dedup();
+
     for app in apps {
         app.apply(&setting);
     }
