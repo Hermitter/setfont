@@ -71,6 +71,11 @@ fn main() {
         apps.push(app);
     }
 
+    // Remove duplicates.
+    apps.sort_unstable();
+    apps.dedup();
+
+    // Avoid rayon overhead for 0 or 1 app.
     match apps.len() {
         0 => {}
         1 => {
@@ -78,10 +83,6 @@ fn main() {
             app.apply(&setting);
         }
         _ => {
-            // Remove duplicates.
-            apps.sort_unstable();
-            apps.dedup();
-
             // Using slice to avoid extra overhead of draining the vector.
             let apps = apps.as_slice();
 
