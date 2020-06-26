@@ -70,12 +70,21 @@ fn main() {
         apps.push(app);
     }
 
-    // Remove duplicates.
-    apps.sort_unstable();
-    apps.dedup();
+    match apps.len() {
+        0 => {}
+        1 => {
+            let app = apps[0];
+            app.apply(&setting);
+        }
+        _ => {
+            // Remove duplicates.
+            apps.sort_unstable();
+            apps.dedup();
 
-    for app in apps {
-        app.apply(&setting);
+            for app in apps {
+                app.apply(&setting);
+            }
+        }
     }
 
     // TODO: Set `did_error` if `App::apply` fails.
