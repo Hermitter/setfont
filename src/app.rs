@@ -5,14 +5,14 @@
 macro_rules! apps {
     ($(
         $(#[doc = $doc:literal])+
-        #[cfg($cfg:meta)]
+        $(#[cfg($cfg:meta)])?
         $name:ident = $option:expr,
     )+) => {
         /// A supported application.
         #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
         pub enum App {$(
             $(#[doc = $doc])+
-            #[cfg($cfg)]
+            $(#[cfg($cfg)])?
             $name,
         )+}
 
@@ -21,7 +21,7 @@ macro_rules! apps {
             pub fn from_str(s: &str) -> Option<Self> {
                 match s {
                     $(
-                        #[cfg($cfg)]
+                        $(#[cfg($cfg)])?
                         $option => Some(Self::$name),
                     )+
                     _ => None,
@@ -31,7 +31,7 @@ macro_rules! apps {
             /// Prints all app options.
             pub fn print_all_options() {
                 $(
-                    #[cfg($cfg)]
+                    $(#[cfg($cfg)])?
                     println!($option);
                 )+
             }
