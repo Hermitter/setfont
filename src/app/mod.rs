@@ -9,8 +9,10 @@ macro_rules! apps {
     ($(
         $(#[doc = $doc:literal])+
         $(#[cfg($cfg:meta)])?
-        $name:ident = $option:expr,
+        $name:ident = $option:ident,
     )+) => {
+        $(mod $option;)+
+
         /// A supported application.
         #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
         pub enum App {$(
@@ -25,7 +27,7 @@ macro_rules! apps {
                 match s {
                     $(
                         $(#[cfg($cfg)])?
-                        $option => Some(Self::$name),
+                        stringify!($option) => Some(Self::$name),
                     )+
                     _ => None,
                 }
@@ -35,7 +37,7 @@ macro_rules! apps {
             pub fn print_all_options() {
                 $(
                     $(#[cfg($cfg)])?
-                    println!($option);
+                    println!(stringify!($option));
                 )+
             }
         }
@@ -44,27 +46,27 @@ macro_rules! apps {
 
 apps! {
     /// [Alacritty](https://github.com/alacritty/alacritty) terminal.
-    Alacritty = "alacritty",
+    Alacritty = alacritty,
 
     /// [Atom](https://github.com/atom/atom) editor by GitHub.
-    Atom = "atom",
+    Atom = atom,
 
     /// [Sublime Text](https://www.sublimetext.com) editor.
-    SublimeText = "sublimetext",
+    SublimeText = sublimetext,
 
     /// The "native" terminal app:
     ///
     /// - [macOS Terminal](https://en.wikipedia.org/wiki/Terminal_(macOS))
     /// - [Windows terminal](https://github.com/microsoft/terminal)
     /// - [GNOME terminal](https://gitlab.gnome.org/GNOME/gnome-terminal)
-    Terminal = "terminal",
+    Terminal = terminal,
 
     /// [Visual Studio Code](https://code.visualstudio.com) editor by Microsoft.
-    VsCode = "vscode",
+    VsCode = vscode,
 
     /// macOS Xcode.app.
     #[cfg(target_os = "macos")]
-    Xcode = "xcode",
+    Xcode = xcode,
 }
 
 impl App {
