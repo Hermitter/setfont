@@ -2,6 +2,7 @@ use std::process;
 
 pub mod app;
 pub mod cli;
+pub mod font;
 
 fn main() {
     let matches = cli::app().get_matches();
@@ -12,6 +13,14 @@ fn main() {
     let (font, apps) = match (font, apps) {
         (Some(font), Some(apps)) => (font, apps),
         _ => unreachable!("required values not provided"),
+    };
+
+    let font = match font::Font::from_os_str(font) {
+        Some(font) => font,
+        None => {
+            eprintln!("error: invalid font name {:?}", font);
+            process::exit(1);
+        }
     };
 
     for app in apps {
@@ -30,6 +39,6 @@ fn main() {
         };
 
         // TODO: Actually set the font.
-        println!("Setting font {:?} for {:?}...", font, app);
+        println!("Setting font {:?} for {:?}...", font.as_str(), app);
     }
 }
