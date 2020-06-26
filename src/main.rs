@@ -6,6 +6,7 @@
 compile_error!("Only macOS, Linux, and Windows are supported");
 
 use std::process;
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 pub mod app;
 pub mod cli;
@@ -81,9 +82,9 @@ fn main() {
             apps.sort_unstable();
             apps.dedup();
 
-            for app in apps {
+            apps.into_par_iter().for_each(|app| {
                 app.apply(&setting);
-            }
+            });
         }
     }
 
