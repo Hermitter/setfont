@@ -17,3 +17,19 @@ pub enum Setting<'a> {
         ligatures: LigaturesFlag,
     },
 }
+
+impl<'a> Setting<'a> {
+    pub fn new(
+        font: Option<Font<'a>>,
+        ligatures: Option<LigaturesFlag>,
+    ) -> Option<Self> {
+        match (font, ligatures) {
+            (Some(font), Some(ligatures)) => {
+                Some(Self::Both { font, ligatures })
+            }
+            (Some(font), None) => Some(Self::Font(font)),
+            (None, Some(ligatures)) => Some(Self::Ligatures(ligatures)),
+            (None, None) => None,
+        }
+    }
+}

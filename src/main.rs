@@ -43,11 +43,9 @@ fn main() {
 
     let ligatures = matches.ligatures_flag();
 
-    let setting = match (font, ligatures) {
-        (Some(font), Some(ligatures)) => Setting::Both { font, ligatures },
-        (Some(font), None) => Setting::Font(font),
-        (None, Some(ligatures)) => Setting::Ligatures(ligatures),
-        (None, None) => unreachable!("required"),
+    let setting = match Setting::new(font, ligatures) {
+        Some(setting) => setting,
+        None => unreachable!("required"),
     };
 
     let mut did_error = false;
