@@ -17,17 +17,9 @@ pub fn app() -> App<'static, 'static> {
         .about(ABOUT)
         .settings(&[
             AppSettings::ArgRequiredElseHelp,
+            AppSettings::DeriveDisplayOrder,
             AppSettings::SubcommandsNegateReqs,
         ])
-        .arg(
-            Arg::with_name("font")
-                .help("The primary font to set")
-                .value_name("FONT")
-                .short("f")
-                .long("font")
-                .required(true)
-                .takes_value(true),
-        )
         .arg(
             Arg::with_name("apps")
                 .help("The applications to set the primary font of")
@@ -37,6 +29,15 @@ pub fn app() -> App<'static, 'static> {
                 .takes_value(true)
                 .multiple(true)
                 .required(true),
+        )
+        .arg(
+            Arg::with_name("font")
+                .help("The primary font to set")
+                .value_name("FONT")
+                .short("f")
+                .long("font")
+                .required(true)
+                .takes_value(true),
         )
         .subcommand(
             SubCommand::with_name("list")
