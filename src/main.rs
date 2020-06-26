@@ -82,6 +82,9 @@ fn main() {
             apps.sort_unstable();
             apps.dedup();
 
+            // Using slice to avoid extra overhead of draining the vector.
+            let apps = apps.as_slice();
+
             apps.into_par_iter().for_each(|app| {
                 app.apply(&setting);
             });
