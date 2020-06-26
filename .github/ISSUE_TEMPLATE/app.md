@@ -22,6 +22,11 @@ Be sure that `yourapp` does not conflict with an existing app!
 -->
 Argument value: `yourapp`
 
+<!--
+Where can one go to read more about the app?
+-->
+Website: https://example.com
+
 <!-- What app versions should we support? -->
 Versions: undecided
 
