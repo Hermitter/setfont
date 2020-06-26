@@ -26,6 +26,14 @@ values like `terminal` are exempt because the name exists on multiple platforms.
 Argument value: `yourapp`
 
 <!--
+Does this app support ligatures?
+
+If it does, change this to "yes" and explain how we can enable/disable them in
+the "Approach" section below.
+-->
+Supports ligatures: no
+
+<!--
 Where can one go to read more about the app?
 -->
 Website: https://example.com
