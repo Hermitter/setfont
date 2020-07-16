@@ -11,16 +11,16 @@ macro_rules! apps {
     ($(
         $(#[doc = $doc:literal])+
         $(#[cfg($cfg:meta)])?
-        $name:ident = $option:ident,
+        $case:ident, $module:ident, $string:literal;
     )+) => {
-        $(mod $option;)+
+        $(mod $module;)+
 
         /// A supported application.
         #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
         pub enum App {$(
             $(#[doc = $doc])+
             $(#[cfg($cfg)])?
-            $name,
+            $case,
         )+}
 
         impl App {
@@ -29,7 +29,7 @@ macro_rules! apps {
                 match s {
                     $(
                         $(#[cfg($cfg)])?
-                        stringify!($option) => Some(Self::$name),
+                        $string => Some(Self::$case),
                     )+
                     _ => None,
                 }
@@ -39,7 +39,7 @@ macro_rules! apps {
             pub fn print_all_options() {
                 $(
                     $(#[cfg($cfg)])?
-                    println!(stringify!($option));
+                    println!($string);
                 )+
             }
         }
@@ -48,27 +48,27 @@ macro_rules! apps {
 
 apps! {
     /// [Alacritty](https://github.com/alacritty/alacritty) terminal.
-    Alacritty = alacritty,
+    Alacritty, alacritty, "alacritty";
 
     /// [Atom](https://github.com/atom/atom) editor by GitHub.
-    Atom = atom,
+    Atom, atom, "atom";
 
     /// [Sublime Text](https://www.sublimetext.com) editor.
-    SublimeText = sublimetext,
+    SublimeText, sublimetext, "sublimetext";
 
     /// The "native" terminal app:
     ///
     /// - [macOS Terminal](https://en.wikipedia.org/wiki/Terminal_(macOS))
     /// - [Windows terminal](https://github.com/microsoft/terminal)
     /// - [GNOME terminal](https://gitlab.gnome.org/GNOME/gnome-terminal)
-    Terminal = terminal,
+    Terminal, terminal, "terminal";
 
     /// [Visual Studio Code](https://code.visualstudio.com) editor by Microsoft.
-    VsCode = vscode,
+    VsCode, vscode, "vscode";
 
     /// macOS Xcode.app.
     #[cfg(target_os = "macos")]
-    Xcode = xcode,
+    Xcode, xcode, "xcode";
 }
 
 impl App {
