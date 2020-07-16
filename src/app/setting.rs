@@ -32,4 +32,20 @@ impl<'a> Setting<'a> {
             (None, None) => None,
         }
     }
+
+    pub fn font(&self) -> Option<&Font<'a>> {
+        match self {
+            Self::Font(font) | Self::Both { font, .. } => Some(font),
+            _ => None,
+        }
+    }
+
+    pub fn ligatures(&self) -> Option<LigaturesFlag> {
+        match *self {
+            Self::Ligatures(ligatures) | Self::Both { ligatures, .. } => {
+                Some(ligatures)
+            }
+            _ => None,
+        }
+    }
 }
