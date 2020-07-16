@@ -22,10 +22,7 @@ use ext::ArgMatchesExt;
 use shared::Shared;
 
 /// The catch-all error type of this program.
-///
-/// Note that this is not `dyn std::error::Error` because we only care about
-/// presenting a message to the user.
-pub type Error = Box<dyn std::fmt::Display>;
+pub type Error = Box<dyn std::error::Error>;
 
 pub type Result<T = ()> = std::result::Result<T, Error>;
 
