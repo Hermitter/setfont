@@ -1,4 +1,4 @@
-use crate::Shared;
+use crate::{Result, Shared};
 
 mod setting;
 pub use setting::Setting;
@@ -44,7 +44,7 @@ macro_rules! apps {
             }
 
             /// Applies a setting state to the app, based on input arguments.
-            pub fn apply(self, setting: &Setting, shared: &Shared) {
+            pub fn apply(self, setting: &Setting, shared: &Shared) -> Result {
                 match self {$(
                     $(#[cfg($cfg)])?
                     Self::$case => $module::apply(setting, shared),

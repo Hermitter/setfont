@@ -6,7 +6,10 @@
 compile_error!("Only macOS, Linux, and Windows are supported");
 
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use std::process;
+use std::{
+    process,
+    sync::atomic::{AtomicBool, Ordering},
+};
 
 pub mod app;
 pub mod cli;
@@ -17,6 +20,14 @@ pub mod shared;
 use app::{App, Setting};
 use ext::ArgMatchesExt;
 use shared::Shared;
+
+/// The catch-all error type of this program.
+///
+/// Note that this is not `dyn std::error::Error` because we only care about
+/// presenting a message to the user.
+pub type Error = Box<dyn std::fmt::Display>;
+
+pub type Result<T = ()> = std::result::Result<T, Error>;
 
 fn main() {
     let matches = cli::app().get_matches();
@@ -48,7 +59,13 @@ fn main() {
     let setting = Setting::new(font, ligatures)
         .unwrap_or_else(|| unreachable!("required"));
 
-    let mut did_error = false;
+    // Indicates whether an error occurred at any point. If this is `true` by
+    // the end of `main`, the process will terminate with a non-zero exit code.
+    //
+    // This is an atomic value so that it can later be (safely) mutated by more
+    // than one thread in the case of multiple apps.
+    let mut did_error = AtomicBool::new(false);
+
     let mut apps = Vec::<App>::new();
 
     for app_arg in app_args {
@@ -57,13 +74,13 @@ fn main() {
                 Some(app) => app,
                 None => {
                     eprintln!("error: unknown app {:?}", app);
-                    did_error = true;
+                    *did_error.get_mut() = true;
                     continue;
                 }
             },
             None => {
                 eprintln!("error: invalid UTF-8 string {:?}", app_arg);
-                did_error = true;
+                *did_error.get_mut() = true;
                 continue;
             }
         };
@@ -71,7 +88,7 @@ fn main() {
         apps.push(app);
     }
 
-    let shared = Shared::new(did_error);
+    let shared = Shared::new();
 
     // Remove duplicates.
     apps.sort_unstable();
@@ -82,19 +99,25 @@ fn main() {
         0 => {}
         1 => {
             let app = apps[0];
-            app.apply(&setting, &shared);
+            if let Err(error) = app.apply(&setting, &shared) {
+                *did_error.get_mut() = true;
+                eprintln!("error: {}", error);
+            }
         }
         _ => {
             // Using slice to avoid extra overhead of draining the vector.
             let apps = apps.as_slice();
 
             apps.into_par_iter().for_each(|app| {
-                app.apply(&setting, &shared);
+                if let Err(error) = app.apply(&setting, &shared) {
+                    did_error.store(true, Ordering::SeqCst);
+                    eprintln!("error: {}", error);
+                }
             });
         }
     }
 
-    if shared.did_error.into_inner() {
+    if did_error.into_inner() {
         process::exit(1);
     }
 }
