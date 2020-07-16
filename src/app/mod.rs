@@ -42,6 +42,14 @@ macro_rules! apps {
                     println!($string);
                 )+
             }
+
+            /// Applies a setting state to the app, based on input arguments.
+            pub fn apply(self, setting: &Setting, shared: &Shared) {
+                match self {$(
+                    $(#[cfg($cfg)])?
+                    Self::$case => $module::apply(setting, shared),
+                )+}
+            }
         }
     };
 }
@@ -69,11 +77,4 @@ apps! {
     /// macOS Xcode.app.
     #[cfg(target_os = "macos")]
     Xcode, xcode, "xcode";
-}
-
-impl App {
-    /// Applies a setting state to the app, based on input arguments.
-    pub fn apply(self, setting: &Setting, _shared: &Shared) {
-        unimplemented!("apply {:?} to {:?}", setting, self);
-    }
 }
