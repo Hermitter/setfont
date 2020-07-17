@@ -77,4 +77,8 @@ apps! {
     /// macOS Xcode.app.
     #[cfg(target_os = "macos")]
     Xcode, xcode, "xcode";
+
+    /// [Tilix](https://gnunn1.github.io/tilix-web/) GTK3 terminal.
+    #[cfg(target_os = "linux")]
+    Tilix, tilix, "tilix";
 }
