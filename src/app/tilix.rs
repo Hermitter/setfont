@@ -9,7 +9,7 @@ use std::{env, fs};
 /// Profile ID Tilix creates on first launch
 const DEFAULT_PROFILE_ID: &str = "2b7c4080-0ddd-46c5-8f23-563fd3ba789d";
 /// Tilix's default setting for font family
-const DEFAULT_FONT_FAMILY: &str = "Monospace Regular";
+const DEFAULT_FONT: &str = "Monospace Regular";
 /// Tilix's default setting for font size
 const DEFAULT_FONT_SIZE: &str = "12";
 
@@ -22,11 +22,7 @@ pub fn apply(setting: &Setting, _shared: &Shared) -> Result {
         )));
     }
 
-    let font = match setting.font() {
-        Some(f) => f.as_str(),
-        None => DEFAULT_FONT_FAMILY,
-    };
-
+    let font = setting.font();
     let tilix_settings = get_tilix_settings()?;
 
     // Update the default Tilix profile, if set
@@ -36,12 +32,19 @@ pub fn apply(setting: &Setting, _shared: &Shared) -> Result {
     {
         let profile_id = capture.name("id").unwrap().as_str();
 
-        let (font, size) = get_font_name_and_size(profile_id, &tilix_settings)
-            .unwrap_or_else(|| (font, DEFAULT_FONT_SIZE));
+        // Save current font settings since both might not be set
+        let (current_font, current_size) =
+            get_font_name_and_size(profile_id, &tilix_settings)
+                .unwrap_or((DEFAULT_FONT, DEFAULT_FONT_SIZE));
+
+        let font = match font {
+            Some(f) => f.as_str(),
+            None => current_font,
+        };
 
         let settings = format!(
             "[profiles/{}]\nfont='{} {}'\nuse-system-font=false",
-            profile_id, font, size
+            profile_id, font, current_size
         );
 
         set_tilix_settings(&settings)
@@ -50,9 +53,18 @@ pub fn apply(setting: &Setting, _shared: &Shared) -> Result {
     else if tilix_settings
         .contains(&format!("[profiles/{}]\n", DEFAULT_PROFILE_ID))
     {
+        let (current_font, current_size) =
+            get_font_name_and_size(DEFAULT_PROFILE_ID, &tilix_settings)
+                .unwrap_or((DEFAULT_FONT, DEFAULT_FONT_SIZE));
+
+        let font = match font {
+            Some(f) => f.as_str(),
+            None => current_font,
+        };
+
         let settings = format!(
             "[profiles/{}]\nfont='{} {}'\nuse-system-font=false",
-            DEFAULT_PROFILE_ID, DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE
+            DEFAULT_PROFILE_ID, font, current_size
         );
 
         set_tilix_settings(&settings)
@@ -60,6 +72,11 @@ pub fn apply(setting: &Setting, _shared: &Shared) -> Result {
     // Manually create the Tilix tilix_settings settings.
     // Occurs if Tilix was installed, but never launched
     else {
+        let font = match setting.font() {
+            Some(f) => f.as_str(),
+            None => DEFAULT_FONT,
+        };
+
         let settings = &format!(
             "[profiles/{}]\nvisible-name='Default'\nfont='{} {}'\nuse-system-font=false",
             DEFAULT_PROFILE_ID,
