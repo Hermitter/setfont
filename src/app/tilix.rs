@@ -1,5 +1,5 @@
 use super::Setting;
-use crate::{Result, Shared};
+use crate::{font::Font, Result, Shared};
 use regex::Regex;
 use std::io::{Error, ErrorKind, Write};
 use std::process::{Command, Stdio};
@@ -22,7 +22,6 @@ pub fn apply(setting: &Setting, _shared: &Shared) -> Result {
         )));
     }
 
-    let font = setting.font();
     let tilix_settings = get_tilix_settings()?;
 
     // Update the default Tilix profile, if set
@@ -32,19 +31,15 @@ pub fn apply(setting: &Setting, _shared: &Shared) -> Result {
     {
         let profile_id = capture.name("id").unwrap().as_str();
 
-        // Save current font settings since both might not be set
+        // TODO: When feature is released, change_current size for cli arg value.
         let (current_font, current_size) =
-            get_font_name_and_size(profile_id, &tilix_settings)
-                .unwrap_or((DEFAULT_FONT, DEFAULT_FONT_SIZE));
-
-        let font = match font {
-            Some(f) => f.as_str(),
-            None => current_font,
-        };
+            get_font_name_and_size(profile_id, &tilix_settings);
 
         let settings = format!(
             "[profiles/{}]\nfont='{} {}'\nuse-system-font=false",
-            profile_id, font, current_size
+            profile_id,
+            unwrap_font(&setting.font(), current_font),
+            current_size
         );
 
         set_tilix_settings(&settings)
@@ -53,18 +48,15 @@ pub fn apply(setting: &Setting, _shared: &Shared) -> Result {
     else if tilix_settings
         .contains(&format!("[profiles/{}]\n", DEFAULT_PROFILE_ID))
     {
+        // TODO: When feature is released, change_current size for cli arg value.
         let (current_font, current_size) =
-            get_font_name_and_size(DEFAULT_PROFILE_ID, &tilix_settings)
-                .unwrap_or((DEFAULT_FONT, DEFAULT_FONT_SIZE));
-
-        let font = match font {
-            Some(f) => f.as_str(),
-            None => current_font,
-        };
+            get_font_name_and_size(DEFAULT_PROFILE_ID, &tilix_settings);
 
         let settings = format!(
             "[profiles/{}]\nfont='{} {}'\nuse-system-font=false",
-            DEFAULT_PROFILE_ID, font, current_size
+            DEFAULT_PROFILE_ID,
+            unwrap_font(&setting.font(), current_font),
+            current_size
         );
 
         set_tilix_settings(&settings)
@@ -72,15 +64,10 @@ pub fn apply(setting: &Setting, _shared: &Shared) -> Result {
     // Manually create the Tilix tilix_settings settings.
     // Occurs if Tilix was installed, but never launched
     else {
-        let font = match setting.font() {
-            Some(f) => f.as_str(),
-            None => DEFAULT_FONT,
-        };
-
         let settings = &format!(
             "[profiles/{}]\nvisible-name='Default'\nfont='{} {}'\nuse-system-font=false",
             DEFAULT_PROFILE_ID,
-            font,
+            unwrap_font(&setting.font(), DEFAULT_FONT),
             DEFAULT_FONT_SIZE// TODO: change when setting.size is a feature
         );
 
@@ -101,6 +88,14 @@ fn is_program_in_path(program: &str) -> bool {
     }
 
     false
+}
+
+/// Return CLI font argument or a fallback option.
+fn unwrap_font<'a>(font: &'a Option<&Font>, fallback_font: &'a str) -> &'a str {
+    match font {
+        Some(f) => f.as_str(),
+        None => fallback_font,
+    }
 }
 
 /// Adjust/add new settings to Tilix's dconf entry.
@@ -136,11 +131,11 @@ fn get_tilix_settings() -> Result<String> {
     }
 }
 
-/// Obtain the font name and size in Tilix's dconf settings`.
+/// Obtain the current font name and size in Tilix's dconf settings`.
 fn get_font_name_and_size<'a>(
     profile_id: &str,
     dconf_settings: &'a str,
-) -> Option<(&'a str, &'a str)> {
+) -> (&'a str, &'a str) {
     let captures = Regex::new(&format!(
         r"(?s)\[profiles/{}\].*font='(?P<font>.*?)(?P<size>\d+)'",
         profile_id
@@ -152,8 +147,8 @@ fn get_font_name_and_size<'a>(
         Some(group) => {
             let font = group.name("font").unwrap().as_str();
             let size = group.name("size").unwrap().as_str();
-            Some((font, size))
+            (font, size)
         }
-        None => None,
+        None => (DEFAULT_FONT, DEFAULT_FONT_SIZE),
     }
 }
