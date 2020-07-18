@@ -22,6 +22,7 @@ pub fn apply(setting: &Setting, _shared: &Shared) -> Result {
         )));
     }
 
+    // Settings can be viewed with: $ dconf dump /com/gexperts/Tilix/
     let tilix_settings = get_tilix_settings()?;
 
     // Update the default Tilix profile, if set
@@ -61,8 +62,8 @@ pub fn apply(setting: &Setting, _shared: &Shared) -> Result {
 
         set_tilix_settings(&settings)
     }
-    // Manually create the Tilix tilix_settings settings.
-    // Occurs if Tilix was installed, but never launched
+    // Manually create Tilix's dconf settings.
+    // Occurs if Tilix was installed, but never launched.
     else {
         let settings = &format!(
             "[profiles/{}]\nvisible-name='Default'\nfont='{} {}'\nuse-system-font=false",
@@ -99,7 +100,7 @@ fn unwrap_font<'a>(font: &'a Option<&Font>, fallback_font: &'a str) -> &'a str {
 }
 
 /// Adjust/add new settings to Tilix's dconf entry.
-/// A new entry is created if one does not exist.
+/// A new entry is created if none exist.
 fn set_tilix_settings(settings: &str) -> Result {
     let mut child = Command::new("dconf")
         .args(&["load", "/com/gexperts/Tilix/"])
