@@ -15,7 +15,7 @@ const DEFAULT_FONT_SIZE: &str = "12";
 
 pub fn apply(setting: &Setting, _shared: &Shared) -> Result {
     // Ensure Tilix & dconf are installed.
-    if !is_program_in_path("tilix") && !is_program_in_path("dconf") {
+    if !is_program_in_path("tilix") || !is_program_in_path("dconf") {
         return Err(Box::new(Error::new(
             ErrorKind::Other,
             "Could not find Tilix installation",
