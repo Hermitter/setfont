@@ -3,7 +3,7 @@ use crate::{font::Font, Result, Shared};
 use regex::Regex;
 use std::io::{Error, ErrorKind, Write};
 use std::process::{Command, Stdio};
-use std::{env, fs};
+use which::which;
 
 // Schema for Tilix dconf settings: https://github.com/gnunn1/tilix/blob/4178cf16f4b15f06b679fa05c0fa6fc8afd40999/source/gx/tilix/preferences.d#L315
 /// Profile ID Tilix creates on first launch
@@ -15,7 +15,7 @@ const DEFAULT_FONT_SIZE: &str = "12";
 
 pub fn apply(setting: &Setting, _shared: &Shared) -> Result {
     // Ensure Tilix & dconf are installed.
-    if !is_program_in_path("tilix") || !is_program_in_path("dconf") {
+    if which("tilix").is_err() || which("dconf").is_err() {
         return Err(Box::new(Error::new(
             ErrorKind::Other,
             "Could not find Tilix installation",
@@ -67,21 +67,6 @@ pub fn apply(setting: &Setting, _shared: &Shared) -> Result {
             DEFAULT_FONT_SIZE// TODO: change when setting.size is a feature
         ))
     }
-}
-
-// We should provide a utility function for this in app/mod.rs.
-// Note that Windows would use ";" as a separator.
-/// Validate programs in the PATH environment variable
-fn is_program_in_path(program: &str) -> bool {
-    if let Ok(path) = env::var("PATH") {
-        return path
-            .split(":")
-            .into_iter()
-            .find(|p| fs::metadata(format!("{}/{}", p, program)).is_ok())
-            .is_some();
-    }
-
-    false
 }
 
 /// Return CLI font argument or a fallback option.
