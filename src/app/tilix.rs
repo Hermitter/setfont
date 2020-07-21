@@ -22,7 +22,6 @@ pub fn apply(setting: &Setting, _shared: &Shared) -> Result {
         )));
     }
 
-    // Settings can be viewed with: $ dconf dump /com/gexperts/Tilix/
     let tilix_settings = get_tilix_settings()?;
 
     // Update the default Tilix profile, if set
@@ -36,14 +35,12 @@ pub fn apply(setting: &Setting, _shared: &Shared) -> Result {
         let (current_font, current_size) =
             get_font_name_and_size(profile_id, &tilix_settings);
 
-        let settings = format!(
+        set_tilix_settings(&format!(
             "[profiles/{}]\nfont='{} {}'\nuse-system-font=false",
             profile_id,
             unwrap_font(&setting.font(), current_font),
             current_size
-        );
-
-        set_tilix_settings(&settings)
+        ))
     }
     // Update the profile Tilix first created.
     else if tilix_settings
@@ -53,26 +50,22 @@ pub fn apply(setting: &Setting, _shared: &Shared) -> Result {
         let (current_font, current_size) =
             get_font_name_and_size(DEFAULT_PROFILE_ID, &tilix_settings);
 
-        let settings = format!(
+        set_tilix_settings(&format!(
             "[profiles/{}]\nfont='{} {}'\nuse-system-font=false",
             DEFAULT_PROFILE_ID,
             unwrap_font(&setting.font(), current_font),
             current_size
-        );
-
-        set_tilix_settings(&settings)
+        ))
     }
     // Manually create Tilix's dconf settings.
     // Occurs if Tilix was installed, but never launched.
     else {
-        let settings = &format!(
+        set_tilix_settings(& &format!(
             "[profiles/{}]\nvisible-name='Default'\nfont='{} {}'\nuse-system-font=false",
             DEFAULT_PROFILE_ID,
             unwrap_font(&setting.font(), DEFAULT_FONT),
             DEFAULT_FONT_SIZE// TODO: change when setting.size is a feature
-        );
-
-        set_tilix_settings(&settings)
+        ))
     }
 }
 
@@ -120,6 +113,7 @@ fn set_tilix_settings(settings: &str) -> Result {
 }
 
 /// Obtain a `String` of Tilix's settings inside dconf.
+/// Dconf settings can be viewed with: `$ dconf dump /com/gexperts/Tilix/`
 fn get_tilix_settings() -> Result<String> {
     let dconf = Command::new("dconf")
         .args(&["dump", "/com/gexperts/Tilix/"])
